@@ -20,6 +20,19 @@ Construir uma base de backend limpa, modular e pronta para evoluir com:
 - O banco local roda em Docker Compose para padronizar a execução do projeto.
 - O `PrismaModule` foi deixado global para reduzir repetição de imports nos módulos de domínio.
 
+## Class Validator vs Zod
+
+Neste desafio eu segui com `class-validator` e `class-transformer` porque o enunciado pede esse padrão e os DTOs já mostram mensagens de validação mais claras.
+
+Pontos relevantes da comparação:
+
+- `class-validator` exige DTO + decorators, então a estrutura acaba aparecendo duas vezes.
+- Em NestJS, ele funciona muito bem com Swagger e com a abordagem tradicional de DTOs.
+- `zod` costuma ser mais direto porque validação e tipagem vivem na mesma estrutura.
+- Isso reduz risco de inconsistência entre tipo e regra de validação.
+- `zod` também lida melhor com coerção de `string` para `number` e `Date`, o que ajuda bastante em APIs.
+- Para este desafio, a escolha foi seguir o requisito; em projetos próprios, eu geralmente prefiro `zod` no backend.
+
 ## Estrutura inicial
 
 - `src/prisma` - integração com Prisma e conexão com o banco.
