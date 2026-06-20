@@ -19,6 +19,8 @@ Construir uma base de backend limpa, modular e pronta para evoluir com:
 - O client do Prisma é gerado em `generated/prisma` e não fica versionado.
 - O banco local roda em Docker Compose para padronizar a execução do projeto.
 - O `PrismaModule` foi deixado global para reduzir repetição de imports nos módulos de domínio.
+- A conexão com o banco usa `PrismaPg` com pool e timeouts configurados para evitar conexões abertas sem necessidade e deixar o comportamento mais previsível.
+- Esses valores podem ser ajustados via `PRISMA_POOL_MAX`, `PRISMA_CONNECTION_TIMEOUT_MS` e `PRISMA_IDLE_TIMEOUT_MS` no `.env`.
 
 ## Class Validator vs Zod
 
@@ -32,6 +34,19 @@ Pontos relevantes da comparação:
 - Isso reduz risco de inconsistência entre tipo e regra de validação.
 - `zod` também lida melhor com coerção de `string` para `number` e `Date`, o que ajuda bastante em APIs.
 - Para este desafio, a escolha foi seguir o requisito; em projetos próprios, eu geralmente prefiro `zod` no backend.
+
+## Repository Pattern
+
+Neste desafio eu não vou usar Repository Pattern, porque a ideia é manter a solução mais direta e sem complexidade desnecessária.
+
+Na minha visão, o Repository Pattern faz mais sentido quando:
+
+- o sistema real já tem mais módulos e queries começando a crescer;
+- existe necessidade de padronizar acesso ao banco em mais de uma camada;
+- a equipe quer centralizar mudanças de persistência e manter um contrato mais estável.
+
+Em plataformas reais de médio porte, eu costumo usar em alguns módulos por organização e consistência de alterações de banco.
+Mas em testes técnicos e aplicações menores, normalmente prefiro acessar o banco direto na camada de `service` ou `usecase`, porque isso reduz custo inicial e deixa o fluxo mais fácil de ler.
 
 ## Estrutura inicial
 
@@ -119,6 +134,11 @@ pnpm start:dev
 
 O projeto usa o schema em `prisma/schema.prisma` com provider `postgresql`.
 A URL de conexão fica em `DATABASE_URL` dentro de `.env`.
+Se precisar tunar o pool de conexões, também use:
+
+- `PRISMA_POOL_MAX`
+- `PRISMA_CONNECTION_TIMEOUT_MS`
+- `PRISMA_IDLE_TIMEOUT_MS`
 
 ## Próximos passos
 
