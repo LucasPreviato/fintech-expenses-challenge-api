@@ -1,98 +1,114 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Fintech Expenses Challenge API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API do desafio técnico em NestJS para gestão financeira corporativa.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Objetivo
 
-## Description
+Construir uma base de backend limpa, modular e pronta para evoluir com:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- autenticação com JWT;
+- categorias por usuário;
+- transações financeiras com filtros e paginação;
+- dashboard com consolidação de dados;
+- PostgreSQL com Prisma 7.
 
-## Project setup
+## Decisões de projeto
 
-```bash
-$ pnpm install
-```
+- Usei NestJS com módulos por responsabilidade para manter o código fácil de crescer.
+- O Prisma foi configurado com o fluxo atual do Prisma 7 para SQL, usando `prisma.config.ts`.
+- O client do Prisma é gerado em `generated/prisma` e não fica versionado.
+- O banco local roda em Docker Compose para padronizar a execução do projeto.
+- O `PrismaModule` foi deixado global para reduzir repetição de imports nos módulos de domínio.
 
-## Compile and run the project
+## Estrutura inicial
 
-```bash
-# development
-$ pnpm run start
+- `src/prisma` - integração com Prisma e conexão com o banco.
+- `prisma/schema.prisma` - schema do banco e geração do client.
+- `docker-compose.yml` - PostgreSQL local.
 
-# watch mode
-$ pnpm run start:dev
+## Pré-requisitos
 
-# production mode
-$ pnpm run start:prod
-```
+- Node.js 24 LTS.
+- pnpm 11.8.0 via Corepack.
+- Docker e Docker Compose.
 
-## Run tests
+## Versões do ambiente
+
+O repositório já vem com travas locais para facilitar a troca de versão:
+
+- `.tool-versions` fixa o Node.js em `24.16.0` neste projeto.
+- `package.json` declara `packageManager: "pnpm@11.8.0"`.
+- O `pnpm` deve ser ativado via Corepack para respeitar essa versão.
+
+### Como trocar com segurança
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+asdf install nodejs 24.16.0
+asdf local nodejs 24.16.0
+corepack prepare pnpm@11.8.0 --activate
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Se o `pnpm` já estiver em cache e falhar na primeira execução, crie o diretório:
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+mkdir -p ~/.local/share/pnpm/.tools/pnpm
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Como rodar
 
-## Resources
+1. Instale as dependências:
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+pnpm install
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+2. Crie o arquivo de ambiente:
 
-## Support
+```bash
+cp .env.example .env
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+3. Suba o banco:
 
-## Stay in touch
+```bash
+pnpm db:up
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+4. Gere o Prisma Client:
 
-## License
+```bash
+pnpm prisma:generate
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+5. Rode as migrations quando os models estiverem definidos:
+
+```bash
+pnpm prisma:migrate
+```
+
+6. Inicie a API:
+
+```bash
+pnpm start:dev
+```
+
+## Scripts úteis
+
+- `pnpm db:up` - sobe o PostgreSQL local.
+- `pnpm db:down` - derruba o PostgreSQL local.
+- `pnpm prisma:generate` - gera o Prisma Client.
+- `pnpm prisma:migrate` - cria/aplica migrations.
+- `pnpm prisma:studio` - abre o Prisma Studio.
+
+## Banco de dados
+
+O projeto usa o schema em `prisma/schema.prisma` com provider `postgresql`.
+A URL de conexão fica em `DATABASE_URL` dentro de `.env`.
+
+## Próximos passos
+
+- criar os models de `User`, `Category` e `Transaction`;
+- montar os módulos de domínio do NestJS;
+- adicionar DTOs, validações e autenticação JWT;
+- criar migrations iniciais;
+- escrever os testes mínimos exigidos no desafio.
