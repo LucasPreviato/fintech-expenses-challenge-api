@@ -38,20 +38,22 @@ O repositório já vem com travas locais para facilitar a troca de versão:
 
 - `.tool-versions` fixa o Node.js em `24.16.0` neste projeto.
 - `package.json` declara `packageManager: "pnpm@11.8.0"`.
-- O `pnpm` deve ser ativado via Corepack para respeitar essa versão.
+- `.tool-versions` também fixa o `pnpm` em `11.8.0` via `asdf`.
+- `.npmrc` força o `pnpm` a respeitar essa versão no install.
 
 ### Como trocar com segurança
 
 ```bash
 asdf install nodejs 24.16.0
+asdf install pnpm 11.8.0
 asdf local nodejs 24.16.0
-corepack prepare pnpm@11.8.0 --activate
+asdf local pnpm 11.8.0
 ```
 
-Se o `pnpm` já estiver em cache e falhar na primeira execução, crie o diretório:
+Se o `pnpm` ainda não estiver disponível no `asdf`, instale o plugin antes:
 
 ```bash
-mkdir -p ~/.local/share/pnpm/.tools/pnpm
+asdf plugin add pnpm
 ```
 
 ## Como rodar
