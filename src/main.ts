@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 function getAllowedOrigins(configService: ConfigService): string[] {
@@ -20,11 +21,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  // app.enableCors({
-  //   origin: getAllowedOrigins(configService),
-  // });
 
-  app.enableCors();
+  app.use(helmet());
+  app.enableCors({
+    origin: getAllowedOrigins(configService),
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -36,4 +37,5 @@ async function bootstrap() {
 
   await app.listen(Number(configService.get<string>('PORT', '3333')));
 }
-bootstrap();
+
+void bootstrap();
