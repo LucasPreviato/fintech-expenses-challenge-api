@@ -68,7 +68,7 @@ A API usa guard global de JWT. Apenas endpoints marcados com `@Public()` ficam a
 
 ### Segurança aplicada
 
-Foi corrigido um problema real de autorização do tipo **IDOR**.
+Foi simulado e corrigido um problema real de autorização do tipo **IDOR** que foi feito desde o inicio do projeto para simulação real.
 
 Antes, as operações de usuário dependiam de IDs enviados pelo cliente em rotas como:
 
