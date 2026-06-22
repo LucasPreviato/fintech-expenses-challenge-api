@@ -8,6 +8,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { CategoriesModule } from './categories/modules/categories.module';
 import { validateEnv } from './config/env.validation';
 import { PrismaModule } from './prisma/prisma.module';
+import { TransactionsModule } from './transactions/modules/transactions.module';
 import { UsersModule } from './users/modules/users.module';
 
 @Module({
@@ -20,6 +21,7 @@ import { UsersModule } from './users/modules/users.module';
     UsersModule,
     AuthModule,
     CategoriesModule,
+    TransactionsModule,
   ],
   controllers: [AppController],
   providers: [

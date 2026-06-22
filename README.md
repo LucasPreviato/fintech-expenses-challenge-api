@@ -25,7 +25,18 @@ Construir uma base de backend limpa, modular e pronta para evoluir com:
 - A API fica protegida por padrão via guard global de JWT. Apenas endpoints marcados com `@Public()` ficam acessíveis sem token, o que reduz o risco de deixar rotas abertas por esquecimento.
 - A resposta pública de `users` usa uma entity simples, apenas como contrato de saída da API, e não uma entity rica com regras de domínio.
 - Eu prefiro usar o Prisma como camada de persistência e conveniência de acesso aos recursos do banco, mas sem acoplar toda a aplicação diretamente ao modelo gerado. Em projetos maiores isso ajuda a reduzir impacto quando a estrutura do banco muda ou quando há falhas/ajustes no client.
+- Para valores monetários das transações, a aplicação usa `Prisma.Decimal`, que expõe a implementação baseada em `decimal.js` no runtime do Prisma. Isso evita usar `number` para dinheiro e reduz risco de erro de precisão em operações como soma, comparação, arredondamento e consolidação do dashboard.
 - Para este desafio eu também mantive a API sem Swagger e sem Scalar, porque o foco é resolver o escopo da entrevista com menos superfície operacional.
+
+## Big.js vs BigNumber.js vs Decimal.js
+
+As três bibliotecas resolvem problemas parecidos, mas com focos ligeiramente diferentes:
+
+- `big.js` é menor e costuma ser uma boa escolha quando a necessidade é aritmética decimal enxuta.
+- `bignumber.js` é forte quando o projeto precisa lidar com números muito grandes, formatos variados e uma API mais ampla para manipulação numérica genérica.
+- `decimal.js` oferece uma superfície mais completa para operações decimais compostas, arredondamento configurável e cenários financeiros em que previsibilidade importa mais do que simplicidade extrema.
+
+Neste backend a escolha foi usar `decimal.js` via `Prisma.Decimal`, porque o domínio de transações e dashboard exige precisão monetária consistente sem converter dinheiro para `number` comum do JavaScript.
 
 ## Class Validator vs Zod
 
@@ -57,6 +68,8 @@ Mas em testes técnicos e aplicações menores, normalmente prefiro acessar o ba
 
 - `src/prisma` - integração com Prisma e conexão com o banco.
 - `src/auth` - autenticação JWT, login, cadastro e `/auth/me`.
+- `src/categories` - CRUD de categorias por usuário.
+- `src/transactions` - CRUD de transações com filtros, paginação e validação monetária.
 - `prisma/schema.prisma` - schema do banco e geração do client.
 - `docker-compose.yml` - PostgreSQL local.
 
@@ -152,7 +165,6 @@ Para permitir o frontend autenticado local ou em deploy, configure também:
 
 ## Próximos passos
 
-- criar os módulos de `Category` e `Transaction`;
-- adicionar DTOs e validações para os próximos módulos;
-- criar migrations iniciais;
-- escrever os testes mínimos exigidos no desafio.
+- implementar os endpoints de dashboard com agregações no backend;
+- escrever os testes mínimos exigidos no desafio;
+- documentar no README os fluxos completos de uso com exemplos de requisição.
