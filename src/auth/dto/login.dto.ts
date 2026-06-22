@@ -14,7 +14,7 @@ export class LoginDto {
   email!: string;
 
   @ApiProperty({
-    example: 'Senha@123',
+    example: 'Demo@123456',
     minLength: 8,
     maxLength: 100,
     description: 'Senha de acesso do usuario.',

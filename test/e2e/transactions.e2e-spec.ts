@@ -28,7 +28,8 @@ describe('Transactions (e2e)', () => {
     const registerResponse = await registerUser(context.app, {
       name: 'Carol Jones',
       email: 'carol@example.com',
-      password: 'StrongPass123',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
     });
     const accessToken = registerResponse.body.accessToken as string;
 
@@ -64,12 +65,14 @@ describe('Transactions (e2e)', () => {
     const ownerResponse = await registerUser(context.app, {
       name: 'Owner User',
       email: 'owner@example.com',
-      password: 'StrongPass123',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
     });
     const intruderResponse = await registerUser(context.app, {
       name: 'Intruder User',
       email: 'intruder@example.com',
-      password: 'StrongPass123',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
     });
 
     const ownerCategoryResponse = await request(context.app.getHttpServer())
@@ -110,7 +113,8 @@ describe('Transactions (e2e)', () => {
     const registerResponse = await registerUser(context.app, {
       name: 'Filter User',
       email: 'filters@example.com',
-      password: 'StrongPass123',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
     });
     const accessToken = registerResponse.body.accessToken as string;
 

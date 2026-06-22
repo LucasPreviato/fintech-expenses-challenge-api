@@ -15,6 +15,13 @@ export class DemoDataBootstrapService implements OnApplicationBootstrap {
   constructor(private readonly prisma: PrismaService) {}
 
   async onApplicationBootstrap(): Promise<void> {
+    if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
+      this.logger.log(
+        'Bootstrap de dados demo ignorado durante a execucao de testes.',
+      );
+      return;
+    }
+
     const existingDemoUser = await this.prisma.user.findFirst({
       where: {
         email: DEMO_USER.email,

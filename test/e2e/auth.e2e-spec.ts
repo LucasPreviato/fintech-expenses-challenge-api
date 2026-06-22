@@ -19,7 +19,8 @@ describe('Auth (e2e)', () => {
     const response = await registerUser(context.app, {
       name: 'Alice Johnson',
       email: 'alice@example.com',
-      password: 'StrongPass123',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
     });
 
     expect(response.status).toBe(201);
@@ -33,13 +34,15 @@ describe('Auth (e2e)', () => {
     await registerUser(context.app, {
       name: 'Alice Johnson',
       email: 'alice@example.com',
-      password: 'StrongPass123',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
     }).expect(201);
 
     const response = await registerUser(context.app, {
       name: 'Alice Johnson',
       email: 'alice@example.com',
-      password: 'StrongPass123',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
     });
 
     expect(response.status).toBe(409);
@@ -50,13 +53,14 @@ describe('Auth (e2e)', () => {
     await registerUser(context.app, {
       name: 'Alice Johnson',
       email: 'alice@example.com',
-      password: 'StrongPass123',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
     }).expect(201);
 
     const response = await loginUser(
       context.app,
       'alice@example.com',
-      'StrongPass123',
+      'Demo@123456',
     );
 
     expect(response.status).toBe(201);
@@ -68,7 +72,8 @@ describe('Auth (e2e)', () => {
     await registerUser(context.app, {
       name: 'Alice Johnson',
       email: 'alice@example.com',
-      password: 'StrongPass123',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
     }).expect(201);
 
     const response = await loginUser(
@@ -79,5 +84,92 @@ describe('Auth (e2e)', () => {
 
     expect(response.status).toBe(401);
     expect(response.body.message).toBe('Invalid email or password.');
+  });
+
+  it('rejects registration when confirmPassword does not match', async () => {
+    const response = await registerUser(context.app, {
+      name: 'Alice Johnson',
+      email: 'alice@example.com',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@654321',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain(
+      'password and confirmPassword must match',
+    );
+  });
+
+  it('rejects registration when confirmPassword is missing', async () => {
+    const response = await registerUser(context.app, {
+      name: 'Alice Johnson',
+      email: 'alice@example.com',
+      password: 'Demo@123456',
+      confirmPassword: undefined,
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain(
+      'confirmPassword should not be empty',
+    );
+    expect(response.body.message).toContain(
+      'confirmPassword must be a string',
+    );
+  });
+
+  it('rejects registration with weak password missing an uppercase letter', async () => {
+    const response = await registerUser(context.app, {
+      name: 'Alice Johnson',
+      email: 'alice@example.com',
+      password: 'demo@123456',
+      confirmPassword: 'demo@123456',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain(
+      'password must include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character',
+    );
+  });
+
+  it('rejects registration with weak password missing a lowercase letter', async () => {
+    const response = await registerUser(context.app, {
+      name: 'Alice Johnson',
+      email: 'alice@example.com',
+      password: 'DEMO@123456',
+      confirmPassword: 'DEMO@123456',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain(
+      'password must include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character',
+    );
+  });
+
+  it('rejects registration with weak password missing a number', async () => {
+    const response = await registerUser(context.app, {
+      name: 'Alice Johnson',
+      email: 'alice@example.com',
+      password: 'Demo@abcdef',
+      confirmPassword: 'Demo@abcdef',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain(
+      'password must include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character',
+    );
+  });
+
+  it('rejects registration with weak password missing a special character', async () => {
+    const response = await registerUser(context.app, {
+      name: 'Alice Johnson',
+      email: 'alice@example.com',
+      password: 'Demo123456',
+      confirmPassword: 'Demo123456',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain(
+      'password must include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character',
+    );
   });
 });

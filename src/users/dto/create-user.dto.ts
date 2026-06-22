@@ -7,6 +7,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { IsStrongPasswordPolicy } from '../../common/validators/is-strong-password-policy.decorator';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -33,7 +34,7 @@ export class CreateUserDto {
   email!: string;
 
   @ApiProperty({
-    example: 'Senha@123',
+    example: 'Demo@123456',
     minLength: 8,
     maxLength: 100,
     description: 'Senha de acesso do usuario.',
@@ -41,5 +42,6 @@ export class CreateUserDto {
   @IsString({ message: 'password must be a string' })
   @MinLength(8, { message: 'password must be at least 8 characters long' })
   @MaxLength(100, { message: 'password must be at most 100 characters long' })
+  @IsStrongPasswordPolicy()
   password!: string;
 }

@@ -13,7 +13,9 @@ PATCH {{baseUrl}}/users/1
 Content-Type: application/json
 
 {
-  "name": "John Updated"
+  "name": "John Updated",
+  "password": "Demo@123456",
+  "confirmPassword": "Demo@123456"
 }
 
 ### Remover usuário
