@@ -108,13 +108,11 @@ export class TransactionsService {
     id: string,
     updateTransactionDto: UpdateTransactionDto,
   ): Promise<TransactionEntity> {
-    await this.findOwnedById(userId, id);
-
     if (updateTransactionDto.categoryId !== undefined) {
       await this.ensureOwnedCategory(userId, updateTransactionDto.categoryId);
     }
 
-    const data: Prisma.TransactionUpdateInput = {};
+    const data: Prisma.TransactionUncheckedUpdateManyInput = {};
 
     if (updateTransactionDto.description !== undefined) {
       data.description = updateTransactionDto.description;
@@ -133,35 +131,38 @@ export class TransactionsService {
     }
 
     if (updateTransactionDto.categoryId !== undefined) {
-      data.category = {
-        connect: {
-          id: updateTransactionDto.categoryId,
-        },
-      };
+      data.categoryId = updateTransactionDto.categoryId;
     }
 
-    const transaction = await this.prisma.transaction.update({
+    const updateResult = await this.prisma.transaction.updateMany({
       where: {
         id,
+        userId,
       },
       data,
-      select: transactionSelect,
     });
 
-    return this.toEntity(transaction);
+    if (updateResult.count === 0) {
+      throw new NotFoundException(`Transaction with id "${id}" not found.`);
+    }
+
+    return this.findOwnedById(userId, id);
   }
 
   async remove(userId: string, id: string): Promise<TransactionEntity> {
-    await this.findOwnedById(userId, id);
-
-    const transaction = await this.prisma.transaction.delete({
+    const transaction = await this.findOwnedById(userId, id);
+    const deleteResult = await this.prisma.transaction.deleteMany({
       where: {
         id,
+        userId,
       },
-      select: transactionSelect,
     });
 
-    return this.toEntity(transaction);
+    if (deleteResult.count === 0) {
+      throw new NotFoundException(`Transaction with id "${id}" not found.`);
+    }
+
+    return transaction;
   }
 
   private async findOwnedById(
