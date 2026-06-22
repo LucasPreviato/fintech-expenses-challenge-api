@@ -1,4 +1,5 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../generated/prisma/client';
 
@@ -7,19 +8,14 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  constructor() {
-    const connectionString = process.env.DATABASE_URL;
-
-    if (!connectionString) {
-      throw new Error('DATABASE_URL nao foi definida no ambiente.');
-    }
-
-    const poolMax = Number(process.env.PRISMA_POOL_MAX ?? 10);
+  constructor(private readonly configService: ConfigService) {
+    const connectionString = configService.getOrThrow<string>('DATABASE_URL');
+    const poolMax = Number(configService.get<string>('PRISMA_POOL_MAX', '10'));
     const connectionTimeoutMillis = Number(
-      process.env.PRISMA_CONNECTION_TIMEOUT_MS ?? 5_000,
+      configService.get<string>('PRISMA_CONNECTION_TIMEOUT_MS', '5000'),
     );
     const idleTimeoutMillis = Number(
-      process.env.PRISMA_IDLE_TIMEOUT_MS ?? 300_000,
+      configService.get<string>('PRISMA_IDLE_TIMEOUT_MS', '300000'),
     );
 
     super({
