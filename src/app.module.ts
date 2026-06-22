@@ -8,6 +8,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { CategoriesModule } from './categories/modules/categories.module';
 import { validateEnv } from './config/env.validation';
 import { DashboardModule } from './dashboard/modules/dashboard.module';
+import { DemoDataModule } from './demo-data/modules/demo-data.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TransactionsModule } from './transactions/modules/transactions.module';
 import { UsersModule } from './users/modules/users.module';
@@ -26,6 +27,7 @@ import { UsersModule } from './users/modules/users.module';
     ]),
     PrismaModule,
     UsersModule,
+    DemoDataModule,
     AuthModule,
     DashboardModule,
     CategoriesModule,

@@ -164,6 +164,19 @@ Para permitir o frontend autenticado local ou em deploy, configure também:
 
 - `FRONTEND_URL`
 
+## Bootstrap automatico no start
+
+Quando a API sobe, ela verifica se o usuario `demo@fintech.local` ja existe.
+
+- se nao existir, cria o usuario demo, as categorias e as 300 movimentacoes automaticamente antes de seguir o start;
+- se ja existir, apenas continua a inicializacao da aplicacao sem recriar a massa;
+- isso acontece tanto em desenvolvimento quanto em producao.
+
+### Credenciais do usuario demo
+
+- E-mail: `demo@fintech.local`
+- Senha: `Demo@123456`
+
 ## Próximos passos
 
 - implementar os endpoints de dashboard com agregações no backend;
