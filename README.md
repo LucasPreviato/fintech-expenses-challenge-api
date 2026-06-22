@@ -21,6 +21,9 @@ Construir uma base de backend limpa, modular e pronta para evoluir com:
 - O `PrismaModule` foi deixado global para reduzir repetição de imports nos módulos de domínio.
 - A conexão com o banco usa `PrismaPg` com pool e timeouts configurados para evitar conexões abertas sem necessidade e deixar o comportamento mais previsível.
 - Esses valores podem ser ajustados via `PRISMA_POOL_MAX`, `PRISMA_CONNECTION_TIMEOUT_MS` e `PRISMA_IDLE_TIMEOUT_MS` no `.env`.
+- A resposta pública de `users` usa uma entity simples, apenas como contrato de saída da API, e não uma entity rica com regras de domínio.
+- Eu prefiro usar o Prisma como camada de persistência e conveniência de acesso aos recursos do banco, mas sem acoplar toda a aplicação diretamente ao modelo gerado. Em projetos maiores isso ajuda a reduzir impacto quando a estrutura do banco muda ou quando há falhas/ajustes no client.
+- Para este desafio eu também mantive a API sem Swagger e sem Scalar, porque o foco é resolver o escopo da entrevista com menos superfície operacional.
 
 ## Class Validator vs Zod
 
@@ -142,8 +145,8 @@ Se precisar tunar o pool de conexões, também use:
 
 ## Próximos passos
 
-- criar os models de `User`, `Category` e `Transaction`;
-- montar os módulos de domínio do NestJS;
-- adicionar DTOs, validações e autenticação JWT;
+- conectar a autenticação JWT;
+- criar os módulos de `Category` e `Transaction`;
+- adicionar DTOs e validações para os próximos módulos;
 - criar migrations iniciais;
 - escrever os testes mínimos exigidos no desafio.
