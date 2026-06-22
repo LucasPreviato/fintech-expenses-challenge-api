@@ -1,6 +1,10 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
+  "moduleNameMapper": {
+    "^(\\.{1,2}/.*)\\.js$": "$1"
+  },
   "rootDir": ".",
+  "maxWorkers": 1,
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
