@@ -28,7 +28,8 @@ describe('Dashboard (e2e)', () => {
     const registerResponse = await registerUser(context.app, {
       name: 'Dashboard User',
       email: 'dashboard@example.com',
-      password: 'StrongPass123',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
     });
     const accessToken = registerResponse.body.accessToken as string;
 

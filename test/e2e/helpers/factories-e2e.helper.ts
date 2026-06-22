@@ -2,6 +2,7 @@ type RegisterUserInput = {
   name?: string;
   email?: string;
   password?: string;
+  confirmPassword?: string;
 };
 
 type CreateCategoryInput = {
@@ -27,11 +28,19 @@ function nextSequence(): number {
 
 export function buildUserPayload(overrides: RegisterUserInput = {}) {
   const currentSequence = nextSequence();
+  const password = overrides.password ?? 'Demo@123456';
+  const hasConfirmPasswordOverride = Object.prototype.hasOwnProperty.call(
+    overrides,
+    'confirmPassword',
+  );
 
   return {
     name: overrides.name ?? `Test User ${currentSequence}`,
     email: overrides.email ?? `user${currentSequence}@example.com`,
-    password: overrides.password ?? 'StrongPass123',
+    password,
+    ...(hasConfirmPasswordOverride
+      ? { confirmPassword: overrides.confirmPassword }
+      : { confirmPassword: password }),
   };
 }
 

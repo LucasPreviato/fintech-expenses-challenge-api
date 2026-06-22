@@ -25,7 +25,8 @@ describe('Categories (e2e)', () => {
     const registerResponse = await registerUser(context.app, {
       name: 'Bob Smith',
       email: 'bob@example.com',
-      password: 'StrongPass123',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
     });
 
     const response = await request(context.app.getHttpServer())

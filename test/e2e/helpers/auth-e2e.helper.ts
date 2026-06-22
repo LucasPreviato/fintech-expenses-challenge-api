@@ -6,6 +6,7 @@ type RegisterUserInput = {
   name?: string;
   email?: string;
   password?: string;
+  confirmPassword?: string;
 };
 
 export function registerUser(
