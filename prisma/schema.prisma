@@ -15,6 +15,7 @@ model User {
   email String @unique
   passwordHash String @map("password_hash")
   categories Category[]
+  transactions Transaction[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -30,6 +31,7 @@ model Category {
   description String?
   userId String @map("user_id")
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -37,4 +39,31 @@ model Category {
   @@unique([userId, name])
   @@index([userId])
   @@map("categories")
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+model Transaction {
+  id String @id @default(uuid())
+  description String
+  amount Decimal @db.Decimal(14, 2)
+  date DateTime
+  type TransactionType
+  userId String @map("user_id")
+  categoryId String @map("category_id")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([categoryId])
+  @@index([type])
+  @@index([date])
+  @@index([userId, date(sort: Desc)])
+  @@map("transactions")
 }
