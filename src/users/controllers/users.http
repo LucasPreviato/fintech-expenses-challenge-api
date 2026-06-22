@@ -2,14 +2,11 @@
 [
 
 ]
-### Listar usuários
-GET {{baseUrl}}/users
+### Buscar o proprio usuario autenticado
+GET {{baseUrl}}/users/me
 
-### Buscar usuário por id
-GET {{baseUrl}}/users/1
-
-### Atualizar usuário
-PATCH {{baseUrl}}/users/1
+### Atualizar o proprio usuario autenticado
+PATCH {{baseUrl}}/users/me
 Content-Type: application/json
 
 {
@@ -18,5 +15,5 @@ Content-Type: application/json
   "confirmPassword": "Demo@123456"
 }
 
-### Remover usuário
-DELETE {{baseUrl}}/users/1
+### Remover o proprio usuario autenticado
+DELETE {{baseUrl}}/users/me
