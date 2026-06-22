@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/modules/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { CategoriesModule } from './categories/modules/categories.module';
 import { validateEnv } from './config/env.validation';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/modules/users.module';
@@ -18,6 +19,7 @@ import { UsersModule } from './users/modules/users.module';
     PrismaModule,
     UsersModule,
     AuthModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [
