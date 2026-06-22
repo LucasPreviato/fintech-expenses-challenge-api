@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
   IsIn,
@@ -14,6 +15,10 @@ import {
 } from '../enums/transaction-type.enum';
 
 export class CreateTransactionDto {
+  @ApiProperty({
+    example: 'Pagamento de fornecedor',
+    description: 'Descricao da movimentacao financeira.',
+  })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString({ message: 'description must be a string' })
   @IsNotEmpty({ message: 'description should not be empty' })
@@ -22,6 +27,10 @@ export class CreateTransactionDto {
   })
   description!: string;
 
+  @ApiProperty({
+    example: '1250.50',
+    description: 'Valor positivo em formato decimal string com ate 2 casas.',
+  })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString({ message: 'amount must be a string' })
   @Matches(/^\d+(\.\d{1,2})?$/, {
@@ -30,6 +39,10 @@ export class CreateTransactionDto {
   })
   amount!: string;
 
+  @ApiProperty({
+    example: '2026-06-22T10:30:00.000Z',
+    description: 'Data da transacao em formato ISO 8601.',
+  })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString({ message: 'date must be a string' })
   @IsISO8601(
@@ -40,11 +53,20 @@ export class CreateTransactionDto {
   )
   date!: string;
 
+  @ApiProperty({
+    example: 'expense',
+    enum: transactionTypeValues,
+    description: 'Tipo da transacao.',
+  })
   @IsIn(transactionTypeValues, {
     message: `type must be one of: ${transactionTypeValues.join(', ')}`,
   })
   type!: TransactionTypeValue;
 
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    description: 'Identificador da categoria associada.',
+  })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsUUID('4', { message: 'categoryId must be a valid UUID' })
   categoryId!: string;
