@@ -1,0 +1,25 @@
+@baseUrl = http://localhost:3333
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NzA3OTE0MC1iZmJmLTRmMDAtYjYzMC1iYjAzNzkyODJkYTEiLCJlbWFpbCI6ImpvaG5AZXhhbXBsZS5jb20iLCJpYXQiOjE3ODIwOTI3NTIsImV4cCI6MTc4MjA5MzY1Mn0.OpBcwGHlEYFd0XzpLBL3SxFbLPlDFbxtZMICtQyHLW0
+
+### Registrar usuario
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "12345678"
+}
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "12345678"
+}
+
+### Usuario autenticado
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{authToken}}

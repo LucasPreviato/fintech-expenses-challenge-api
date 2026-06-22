@@ -24,6 +24,16 @@ const userSelect = {
   deletedAt: true,
 } as const;
 
+const userAuthSelect = {
+  id: true,
+  name: true,
+  email: true,
+  passwordHash: true,
+  createdAt: true,
+  updatedAt: true,
+  deletedAt: true,
+} as const;
+
 type UserProjection = {
   id: string;
   name: string;
@@ -31,6 +41,10 @@ type UserProjection = {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
+};
+
+export type UserAuthProjection = UserProjection & {
+  passwordHash: string;
 };
 
 @Injectable()
@@ -84,19 +98,7 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<UserEntity> {
-    const user = await this.prisma.user.findFirst({
-      where: {
-        id,
-        deletedAt: null,
-      },
-      select: userSelect,
-    });
-
-    if (!user) {
-      throw new NotFoundException(`User with id "${id}" not found.`);
-    }
-
-    return this.toEntity(user);
+    return this.findActiveById(id);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
@@ -153,6 +155,32 @@ export class UsersService {
 
   private toEntity(user: UserProjection): UserEntity {
     return new UserEntity(user);
+  }
+
+  async findByEmail(email: string): Promise<UserAuthProjection | null> {
+    return this.prisma.user.findFirst({
+      where: {
+        email,
+        deletedAt: null,
+      },
+      select: userAuthSelect,
+    });
+  }
+
+  async findActiveById(id: string): Promise<UserEntity> {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
+      select: userSelect,
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with id "${id}" not found.`);
+    }
+
+    return this.toEntity(user);
   }
 
   private async hashPassword(password: string): Promise<string> {

@@ -21,6 +21,8 @@ Construir uma base de backend limpa, modular e pronta para evoluir com:
 - O `PrismaModule` foi deixado global para reduzir repetição de imports nos módulos de domínio.
 - A conexão com o banco usa `PrismaPg` com pool e timeouts configurados para evitar conexões abertas sem necessidade e deixar o comportamento mais previsível.
 - Esses valores podem ser ajustados via `PRISMA_POOL_MAX`, `PRISMA_CONNECTION_TIMEOUT_MS` e `PRISMA_IDLE_TIMEOUT_MS` no `.env`.
+- A autenticação utiliza JWT stateless com expiração configurável por variável de ambiente. Refresh tokens não foram implementados por não fazerem parte do escopo do MVP e para evitar complexidade desnecessária no desafio. Em um ambiente produtivo, a evolução natural seria adotar refresh tokens com rotação, armazenamento seguro e revogação.
+- A API fica protegida por padrão via guard global de JWT. Apenas endpoints marcados com `@Public()` ficam acessíveis sem token, o que reduz o risco de deixar rotas abertas por esquecimento.
 - A resposta pública de `users` usa uma entity simples, apenas como contrato de saída da API, e não uma entity rica com regras de domínio.
 - Eu prefiro usar o Prisma como camada de persistência e conveniência de acesso aos recursos do banco, mas sem acoplar toda a aplicação diretamente ao modelo gerado. Em projetos maiores isso ajuda a reduzir impacto quando a estrutura do banco muda ou quando há falhas/ajustes no client.
 - Para este desafio eu também mantive a API sem Swagger e sem Scalar, porque o foco é resolver o escopo da entrevista com menos superfície operacional.
