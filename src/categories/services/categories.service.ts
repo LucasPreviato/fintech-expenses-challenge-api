@@ -93,8 +93,6 @@ export class CategoriesService {
     id: string,
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<CategoryEntity> {
-    await this.findOwnedById(userId, id);
-
     const data: {
       name?: string;
       description?: string | null;
@@ -109,31 +107,38 @@ export class CategoriesService {
     }
 
     try {
-      const category = await this.prisma.category.update({
+      const updateResult = await this.prisma.category.updateMany({
         where: {
           id,
+          userId,
         },
         data,
-        select: categorySelect,
       });
 
-      return this.toEntity(category);
+      if (updateResult.count === 0) {
+        throw new NotFoundException(`Category with id "${id}" not found.`);
+      }
+
+      return this.findOwnedById(userId, id);
     } catch (error) {
       this.handlePrismaError(error, 'name');
     }
   }
 
   async remove(userId: string, id: string): Promise<CategoryEntity> {
-    await this.findOwnedById(userId, id);
-
-    const category = await this.prisma.category.delete({
+    const category = await this.findOwnedById(userId, id);
+    const deleteResult = await this.prisma.category.deleteMany({
       where: {
         id,
+        userId,
       },
-      select: categorySelect,
     });
 
-    return this.toEntity(category);
+    if (deleteResult.count === 0) {
+      throw new NotFoundException(`Category with id "${id}" not found.`);
+    }
+
+    return category;
   }
 
   private async findOwnedById(
