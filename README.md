@@ -209,11 +209,45 @@ Filtros esperados na listagem:
 - `page`
 - `limit`
 
-### Dashboard
+## Dashboard: Prisma convencional vs queries controladas
 
-- `GET /dashboard`
+Na maior parte da API, como autenticação, registro de usuário, categorias e transações, a decisão foi usar o Prisma de forma mais direta nos services.
 
-O dashboard é calculado no backend, não no frontend.
+Essa abordagem foi adotada porque esses fluxos lidam principalmente com operações básicas de CRUD, validação de ownership por usuário e consultas simples. Para esse tipo de necessidade, o Prisma entrega velocidade de desenvolvimento, boa legibilidade e segurança suficiente para o escopo do desafio, mantendo o código objetivo e fácil de revisar.
+
+Exemplos onde o uso direto do Prisma faz sentido neste projeto:
+
+- criação e autenticação de usuários;
+- busca do usuário autenticado;
+- criação, edição e remoção de categorias;
+- criação, edição e remoção de transações;
+- validação de que categoria e transação pertencem ao usuário autenticado.
+
+Já no dashboard, a estratégia foi diferente. Como ele representa uma visão consolidada do negócio, optei por usar queries mais controladas com `queryRaw` e views do PostgreSQL.
+
+A ideia não é dizer que Prisma Client e `queryRaw` competem entre si. Eles resolvem problemas diferentes. O Prisma continua sendo excelente para operações transacionais e consultas simples, enquanto o `queryRaw` oferece mais controle quando precisamos entender exatamente como o banco está agregando, filtrando e calculando os dados.
+
+No desafio, seria possível buscar as transações e calcular saldo, entradas, saídas e categorias no próprio backend usando regras em TypeScript. Porém, para uma visão de dashboard, uma alternativa mais eficiente e prática foi delegar parte dessa consolidação ao PostgreSQL por meio de views e queries específicas.
+
+Essa decisão traz algumas vantagens:
+
+- reduz a quantidade de dados trafegados entre banco e aplicação;
+- mantém o cálculo próximo da fonte dos dados;
+- deixa explícito como os indicadores financeiros são montados;
+- facilita evolução futura para otimizações no banco;
+- evita que o frontend tenha responsabilidade sobre regra financeira;
+- melhora a previsibilidade das consultas do dashboard.
+
+Dashboards podem ter impacto relevante em empresas médias e grandes, porque normalmente são telas acessadas com frequência e usadas para tomada de decisão. Em cenários reais, conforme o volume cresce, a estratégia pode evoluir para outras soluções, como:
+
+- índices específicos para consultas analíticas;
+- views materializadas;
+- read replicas para separar leitura e escrita;
+- cache de indicadores;
+- jobs de pré-agregação;
+- bancos orientados a análise, como soluções OLAP.
+
+Para este MVP, a escolha foi equilibrar simplicidade e maturidade técnica: usar Prisma nas operações básicas para ganhar produtividade e manter o código limpo, enquanto o dashboard usa SQL controlado para representar melhor uma consulta analítica e consolidada.
 
 ## Pré-requisitos
 
@@ -379,22 +413,22 @@ Esse comportamento foi mantido para facilitar a avaliação do desafio.
 
 ## Checklist antes da entrega
 
-- [ ] API sobe localmente sem erro.
-- [ ] Migrations executam corretamente.
-- [ ] Swagger abre em `/docs`.
-- [ ] Registro de usuário funciona.
-- [ ] Login retorna JWT.
-- [ ] `/auth/me` retorna o usuário autenticado.
-- [ ] Usuário A não acessa dados do usuário B.
-- [ ] Categorias são isoladas por usuário.
-- [ ] Transações são isoladas por usuário.
-- [ ] Filtros de transações funcionam.
-- [ ] Paginação funciona.
-- [ ] Dashboard é calculado no backend.
-- [ ] Testes principais passam.
-- [ ] README contém decisões técnicas, instruções locais, variáveis e credenciais demo.
-- [ ] Deploy público está acessível.
-- [ ] `FRONTEND_URL` contém a URL correta do frontend.
+- [x] API sobe localmente sem erro.
+- [x] Migrations executam corretamente.
+- [x] Swagger abre em `/docs`.
+- [x] Registro de usuário funciona.
+- [x] Login retorna JWT.
+- [x] `/auth/me` retorna o usuário autenticado.
+- [x] Usuário A não acessa dados do usuário B.
+- [x] Categorias são isoladas por usuário.
+- [x] Transações são isoladas por usuário.
+- [x] Filtros de transações funcionam.
+- [x] Paginação funciona.
+- [x] Dashboard é calculado no backend.
+- [x] Testes principais passam.
+- [x] README contém decisões técnicas, instruções locais, variáveis e credenciais demo.
+- [x] Deploy público está acessível.
+- [x] `FRONTEND_URL` contém a URL correta do frontend.
 
 ## Observações finais
 
