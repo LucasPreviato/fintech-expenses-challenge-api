@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
@@ -8,6 +9,10 @@ import {
 } from 'class-validator';
 
 export class CreateCategoryDto {
+  @ApiProperty({
+    example: 'Alimentacao',
+    description: 'Nome da categoria financeira.',
+  })
   @Transform(({ value }) =>
     typeof value === 'string' ? value.trim() : value,
   )
@@ -17,6 +22,11 @@ export class CreateCategoryDto {
   @MaxLength(100, { message: 'name must be at most 100 characters long' })
   name!: string;
 
+  @ApiPropertyOptional({
+    example: 'Despesas com refeicoes e lanches.',
+    nullable: true,
+    description: 'Descricao opcional da categoria.',
+  })
   @Transform(({ value }) => {
     if (typeof value !== 'string') {
       return value;

@@ -9,8 +9,20 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { PaginatedResult } from '../../common/pagination';
+import { ApiPaginatedResponse } from '../../common/swagger/api-paginated-response.decorator';
 import { UserEntity } from '../../users/entities/user.entity';
 import { CreateTransactionDto } from '../dto/create-transaction.dto';
 import { ListTransactionsQueryDto } from '../dto/list-transactions-query.dto';
@@ -22,11 +34,20 @@ type RequestWithUser = Request & {
   user: UserEntity;
 };
 
+@ApiTags('Transactions')
+@ApiBearerAuth('bearer')
+@ApiUnauthorizedResponse({ description: 'Token ausente ou invalido.' })
 @Controller('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Criar transacao financeira' })
+  @ApiCreatedResponse({
+    description: 'Transacao criada com sucesso.',
+    type: TransactionEntity,
+  })
+  @ApiBadRequestResponse({ description: 'Dados invalidos para cadastro.' })
   create(
     @Req() request: RequestWithUser,
     @Body() createTransactionDto: CreateTransactionDto,
@@ -38,6 +59,11 @@ export class TransactionsController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Listar transacoes com filtros e paginacao' })
+  @ApiPaginatedResponse(
+    TransactionEntity,
+    'Transacoes listadas com sucesso.',
+  )
   findAll(
     @Req() request: RequestWithUser,
     @Query() listTransactionsQueryDto: ListTransactionsQueryDto,
@@ -49,6 +75,13 @@ export class TransactionsController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Buscar transacao por ID' })
+  @ApiParam({ name: 'id', description: 'ID da transacao.', format: 'uuid' })
+  @ApiOkResponse({
+    description: 'Transacao encontrada com sucesso.',
+    type: TransactionEntity,
+  })
+  @ApiNotFoundResponse({ description: 'Transacao nao encontrada.' })
   findOne(
     @Req() request: RequestWithUser,
     @Param('id') id: string,
@@ -57,6 +90,14 @@ export class TransactionsController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Atualizar transacao por ID' })
+  @ApiParam({ name: 'id', description: 'ID da transacao.', format: 'uuid' })
+  @ApiOkResponse({
+    description: 'Transacao atualizada com sucesso.',
+    type: TransactionEntity,
+  })
+  @ApiBadRequestResponse({ description: 'Dados invalidos para atualizacao.' })
+  @ApiNotFoundResponse({ description: 'Transacao nao encontrada.' })
   update(
     @Req() request: RequestWithUser,
     @Param('id') id: string,
@@ -70,6 +111,13 @@ export class TransactionsController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Remover transacao por ID' })
+  @ApiParam({ name: 'id', description: 'ID da transacao.', format: 'uuid' })
+  @ApiOkResponse({
+    description: 'Transacao removida com sucesso.',
+    type: TransactionEntity,
+  })
+  @ApiNotFoundResponse({ description: 'Transacao nao encontrada.' })
   remove(
     @Req() request: RequestWithUser,
     @Param('id') id: string,
