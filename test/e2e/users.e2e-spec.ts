@@ -20,6 +20,56 @@ describe('Users (e2e)', () => {
     await closeE2eTestContext(context);
   });
 
+  it('blocks cross-user access on legacy routes that accepted user id in the URL', async () => {
+    const attackerRegisterResponse = await registerUser(context.app, {
+      name: 'Attacker User',
+      email: 'attacker@example.com',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
+    }).expect(201);
+
+    const victimRegisterResponse = await registerUser(context.app, {
+      name: 'Victim User',
+      email: 'victim@example.com',
+      password: 'Demo@123456',
+      confirmPassword: 'Demo@123456',
+    }).expect(201);
+
+    const attackerAccessToken = attackerRegisterResponse.body
+      .accessToken as string;
+    const victimUserId = victimRegisterResponse.body.user.id as string;
+
+    await request(context.app.getHttpServer())
+      .get(`/users/${victimUserId}`)
+      .set('Authorization', authHeader(attackerAccessToken))
+      .expect(404);
+
+    await request(context.app.getHttpServer())
+      .patch(`/users/${victimUserId}`)
+      .set('Authorization', authHeader(attackerAccessToken))
+      .send({
+        name: 'Compromised Victim',
+      })
+      .expect(404);
+
+    await request(context.app.getHttpServer())
+      .delete(`/users/${victimUserId}`)
+      .set('Authorization', authHeader(attackerAccessToken))
+      .expect(404);
+
+    const victimProfileResponse = await request(context.app.getHttpServer())
+      .get('/users/me')
+      .set(
+        'Authorization',
+        authHeader(victimRegisterResponse.body.accessToken as string),
+      )
+      .expect(200);
+
+    expect(victimProfileResponse.body.name).toBe('Victim User');
+    expect(victimProfileResponse.body.email).toBe('victim@example.com');
+    expect(victimProfileResponse.body.deletedAt).toBeNull();
+  });
+
   it('updates the password when confirmPassword matches', async () => {
     const registerResponse = await registerUser(context.app, {
       name: 'Update User',
@@ -28,11 +78,10 @@ describe('Users (e2e)', () => {
       confirmPassword: 'Demo@123456',
     }).expect(201);
 
-    const userId = registerResponse.body.user.id as string;
     const accessToken = registerResponse.body.accessToken as string;
 
     const updateResponse = await request(context.app.getHttpServer())
-      .patch(`/users/${userId}`)
+      .patch('/users/me')
       .set('Authorization', authHeader(accessToken))
       .send({
         password: 'Demo@654321',
@@ -60,11 +109,10 @@ describe('Users (e2e)', () => {
       confirmPassword: 'Demo@123456',
     }).expect(201);
 
-    const userId = registerResponse.body.user.id as string;
     const accessToken = registerResponse.body.accessToken as string;
 
     const response = await request(context.app.getHttpServer())
-      .patch(`/users/${userId}`)
+      .patch('/users/me')
       .set('Authorization', authHeader(accessToken))
       .send({
         password: 'Demo@654321',
@@ -84,11 +132,10 @@ describe('Users (e2e)', () => {
       confirmPassword: 'Demo@123456',
     }).expect(201);
 
-    const userId = registerResponse.body.user.id as string;
     const accessToken = registerResponse.body.accessToken as string;
 
     const response = await request(context.app.getHttpServer())
-      .patch(`/users/${userId}`)
+      .patch('/users/me')
       .set('Authorization', authHeader(accessToken))
       .send({
         password: 'Demo@654321',

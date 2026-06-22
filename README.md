@@ -74,6 +74,21 @@ Mas em testes técnicos e aplicações menores, normalmente prefiro acessar o ba
 - `prisma/schema.prisma` - schema do banco e geração do client.
 - `docker-compose.yml` - PostgreSQL local.
 
+## Segurança aplicada
+
+Um hardening importante neste backend foi simular e aplicar uma correção famosa e comum de encontrar em diversas aplicaçoes correção de um caso clássico de IDOR em rotas de usuário.
+
+Antes, o fluxo aceitava `GET /users/:id`, `PATCH /users/:id` e `DELETE /users/:id` apenas com autenticação JWT. Isso é um problema real e comum: mesmo com token válido, o cliente não deve escolher qual usuário será lido, alterado ou removido quando a regra de negócio é self-service.
+
+A correção aplicada foi:
+
+- remover a dependência de `:id` vindo da URL para operações da própria conta;
+- expor apenas `GET /users/me`, `PATCH /users/me` e `DELETE /users/me`;
+- usar o `request.user.id` resolvido pelo token no guard como fonte única da identidade autenticada;
+- cobrir a regressão com teste e2e simulando um usuário tentando operar sobre outra conta.
+
+Esse tipo de ajuste evidencia uma correção real de autorização: autenticação sozinha não garante que o usuário autenticado tenha permissão para agir sobre qualquer recurso identificado pelo cliente.
+
 ## Pré-requisitos
 
 - Node.js 24 LTS.

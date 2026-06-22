@@ -1,27 +1,20 @@
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
-  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiParam,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import {
-  Controller,
-  Get,
-  Patch,
-  Param,
-  Body,
-  Delete,
-  Query,
-} from '@nestjs/common';
-import { PaginatedResult, PaginationQueryDto } from '../../common/pagination';
-import { ApiPaginatedResponse } from '../../common/swagger/api-paginated-response.decorator';
+import { Body, Controller, Delete, Get, Patch, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { UsersService } from '../services/users.service';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserEntity } from '../entities/user.entity';
+
+type RequestWithUser = Request & {
+  user: UserEntity;
+};
 
 @ApiTags('Users')
 @ApiBearerAuth('bearer')
@@ -30,52 +23,37 @@ import { UserEntity } from '../entities/user.entity';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Listar usuarios com paginacao' })
-  @ApiPaginatedResponse(UserEntity, 'Usuarios listados com sucesso.')
-  findAll(
-    @Query() paginationQuery: PaginationQueryDto,
-  ): Promise<PaginatedResult<UserEntity>> {
-    return this.usersService.findAll(paginationQuery);
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Buscar usuario por ID' })
-  @ApiParam({ name: 'id', description: 'ID do usuario.', format: 'uuid' })
+  @Get('me')
+  @ApiOperation({ summary: 'Buscar o proprio usuario autenticado' })
   @ApiOkResponse({
     description: 'Usuario encontrado com sucesso.',
     type: UserEntity,
   })
-  @ApiNotFoundResponse({ description: 'Usuario nao encontrado.' })
-  findOne(@Param('id') id: string): Promise<UserEntity> {
-    return this.usersService.findOne(id);
+  findMe(@Req() request: RequestWithUser): Promise<UserEntity> {
+    return this.usersService.findOne(request.user.id);
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Atualizar usuario por ID' })
-  @ApiParam({ name: 'id', description: 'ID do usuario.', format: 'uuid' })
+  @Patch('me')
+  @ApiOperation({ summary: 'Atualizar o proprio usuario autenticado' })
   @ApiOkResponse({
     description: 'Usuario atualizado com sucesso.',
     type: UserEntity,
   })
   @ApiBadRequestResponse({ description: 'Dados invalidos para atualizacao.' })
-  @ApiNotFoundResponse({ description: 'Usuario nao encontrado.' })
-  update(
-    @Param('id') id: string,
+  updateMe(
+    @Req() request: RequestWithUser,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<UserEntity> {
-    return this.usersService.update(id, updateUserDto);
+    return this.usersService.update(request.user.id, updateUserDto);
   }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'Remover usuario por ID' })
-  @ApiParam({ name: 'id', description: 'ID do usuario.', format: 'uuid' })
+  @Delete('me')
+  @ApiOperation({ summary: 'Remover o proprio usuario autenticado' })
   @ApiOkResponse({
     description: 'Usuario removido com sucesso.',
     type: UserEntity,
   })
-  @ApiNotFoundResponse({ description: 'Usuario nao encontrado.' })
-  remove(@Param('id') id: string): Promise<UserEntity> {
-    return this.usersService.remove(id);
+  removeMe(@Req() request: RequestWithUser): Promise<UserEntity> {
+    return this.usersService.remove(request.user.id);
   }
 }
