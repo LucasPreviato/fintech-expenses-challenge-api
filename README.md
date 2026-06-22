@@ -19,6 +19,37 @@ Construir uma base de backend limpa, modular e pronta para evoluir com:
 - O client do Prisma é gerado em `generated/prisma` e não fica versionado.
 - O banco local roda em Docker Compose para padronizar a execução do projeto.
 - O `PrismaModule` foi deixado global para reduzir repetição de imports nos módulos de domínio.
+- A conexão com o banco usa `PrismaPg` com pool e timeouts configurados para evitar conexões abertas sem necessidade e deixar o comportamento mais previsível.
+- Esses valores podem ser ajustados via `PRISMA_POOL_MAX`, `PRISMA_CONNECTION_TIMEOUT_MS` e `PRISMA_IDLE_TIMEOUT_MS` no `.env`.
+- A resposta pública de `users` usa uma entity simples, apenas como contrato de saída da API, e não uma entity rica com regras de domínio.
+- Eu prefiro usar o Prisma como camada de persistência e conveniência de acesso aos recursos do banco, mas sem acoplar toda a aplicação diretamente ao modelo gerado. Em projetos maiores isso ajuda a reduzir impacto quando a estrutura do banco muda ou quando há falhas/ajustes no client.
+- Para este desafio eu também mantive a API sem Swagger e sem Scalar, porque o foco é resolver o escopo da entrevista com menos superfície operacional.
+
+## Class Validator vs Zod
+
+Neste desafio eu segui com `class-validator` e `class-transformer` porque o enunciado pede esse padrão e os DTOs já mostram mensagens de validação mais claras.
+
+Pontos relevantes da comparação:
+
+- `class-validator` exige DTO + decorators, então a estrutura acaba aparecendo duas vezes.
+- Em NestJS, ele funciona muito bem com Swagger e com a abordagem tradicional de DTOs.
+- `zod` costuma ser mais direto porque validação e tipagem vivem na mesma estrutura.
+- Isso reduz risco de inconsistência entre tipo e regra de validação.
+- `zod` também lida melhor com coerção de `string` para `number` e `Date`, o que ajuda bastante em APIs.
+- Para este desafio, a escolha foi seguir o requisito; em projetos próprios, eu geralmente prefiro `zod` no backend.
+
+## Repository Pattern
+
+Neste desafio eu não vou usar Repository Pattern, porque a ideia é manter a solução mais direta e sem complexidade desnecessária.
+
+Na minha visão, o Repository Pattern faz mais sentido quando:
+
+- o sistema real já tem mais módulos e queries começando a crescer;
+- existe necessidade de padronizar acesso ao banco em mais de uma camada;
+- a equipe quer centralizar mudanças de persistência e manter um contrato mais estável.
+
+Em plataformas reais de médio porte, eu costumo usar em alguns módulos por organização e consistência de alterações de banco.
+Mas em testes técnicos e aplicações menores, normalmente prefiro acessar o banco direto na camada de `service` ou `usecase`, porque isso reduz custo inicial e deixa o fluxo mais fácil de ler.
 
 ## Estrutura inicial
 
@@ -106,11 +137,16 @@ pnpm start:dev
 
 O projeto usa o schema em `prisma/schema.prisma` com provider `postgresql`.
 A URL de conexão fica em `DATABASE_URL` dentro de `.env`.
+Se precisar tunar o pool de conexões, também use:
+
+- `PRISMA_POOL_MAX`
+- `PRISMA_CONNECTION_TIMEOUT_MS`
+- `PRISMA_IDLE_TIMEOUT_MS`
 
 ## Próximos passos
 
-- criar os models de `User`, `Category` e `Transaction`;
-- montar os módulos de domínio do NestJS;
-- adicionar DTOs, validações e autenticação JWT;
+- conectar a autenticação JWT;
+- criar os módulos de `Category` e `Transaction`;
+- adicionar DTOs e validações para os próximos módulos;
 - criar migrations iniciais;
 - escrever os testes mínimos exigidos no desafio.
