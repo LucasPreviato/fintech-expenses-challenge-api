@@ -56,6 +56,7 @@ Mas em testes técnicos e aplicações menores, normalmente prefiro acessar o ba
 ## Estrutura inicial
 
 - `src/prisma` - integração com Prisma e conexão com o banco.
+- `src/auth` - autenticação JWT, login, cadastro e `/auth/me`.
 - `prisma/schema.prisma` - schema do banco e geração do client.
 - `docker-compose.yml` - PostgreSQL local.
 
@@ -145,9 +146,12 @@ Se precisar tunar o pool de conexões, também use:
 - `PRISMA_CONNECTION_TIMEOUT_MS`
 - `PRISMA_IDLE_TIMEOUT_MS`
 
+Para permitir o frontend autenticado local ou em deploy, configure também:
+
+- `FRONTEND_URL`
+
 ## Próximos passos
 
-- conectar a autenticação JWT;
 - criar os módulos de `Category` e `Transaction`;
 - adicionar DTOs e validações para os próximos módulos;
 - criar migrations iniciais;
