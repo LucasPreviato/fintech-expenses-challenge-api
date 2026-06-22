@@ -17,8 +17,10 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  register(registerDto: RegisterDto): Promise<UserEntity> {
-    return this.usersService.create(registerDto);
+  async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
+    const user = await this.usersService.create(registerDto);
+
+    return this.buildAuthResponse(user);
   }
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
